@@ -10,8 +10,10 @@ This assumes you have already forked the coursework repository and cloned the re
 2. Install the requirements `pip install -r requirements.txt`
 3. Run the app `flask --app paralympics run --debug`
 4. Open a browser and go to http://127.0.0.1:5000
-5. Check that you have an instance folder containing `paralympics.sqlite`
-6. Stop the app using `CTRL+C`
+5. Stop the app using `CTRL+C`
+6. Check that you have an instance folder containing `paralympics.sqlite`
+7. Add data to the database by running `data\add_data.py`
+
 
 ## 2. Introduction
 
@@ -403,55 +405,59 @@ A popular, and free, tool is Postman. The app has a lot of features and may you 
 - [Postman download](https://www.postman.com/downloads/)
 - [Postman online (requires signup)](https://go.postman.co/home)
 
-Use postman or similar to try the routes for the paralympic app, e.g.:
+Use postman or other to try the routes for the paralympic app.
 
-- GET for single region: `GET http://127.0.0.1:5000/regions/GBR`
-- GET for all regions: `GET http://127.0.0.1:5000/regions`
+The following include HTTPie commands that you can use in the IDE's Terminal. Make sure you install HTTPie it first!.
 
+- GET for single region to URL http://127.0.0.1:5000/regions/GBR. HTTPie command: `http 127.0.0.1:5000/regions/GBR`
+- GET for all regions to http://127.0.0.1:5000/regions. HTTPie command: `http 127.0.0.1:5000/regions`
+- POST a new region to http://127.0.0.1:5000/regions For HTTPie: `http POST 127.0.0.1:5000/regions NOC=ZZZ region=ZedZedZed`
 
-- POST for new region: `POST http://127.0.0.1:5000/regions` For Postman, in the body select 'raw' and 'JSON' and enter
+    - For Postman, in the body select 'raw' and 'JSON' and enter the JSON below. 
+    ```json
+    {
+      "NOC": "ZZZ",
+      "region": "ZedZedZed"
+    }
+    ```
+- PATCH to update the 'ZZZ' region adding notes. Use URL http://127.0.0.1:5000/regions/ZZZ. For HTTPie: `http PATCH 127.0.0.1:5000/regions/ZZZ notes="A new note."`
+  - For Postman, In the body select 'raw' and 'JSON' and enter
 
-```json
-{
-  "NOC": "ZZZ",
-  "region": "ZedZedZed"
-}
-```
+    ```json
+    {
+      "notes": "A new note."
+    }
+    ```
+- DELETE the "ZZZ" region using URL http://127.0.0.1:5000/regions/ZZZ. For HTTPie: `http DELETE 127.0.0.1:5000/regions/ZZZ`
 
-= PATCH to update the 'ZZZ' region adding notes: `PATCH http://127.0.0.1:5000/regions/ZZZ` In the body select 'raw' and '
-JSON' and enter
+Using the syntax covered above, try the following yourself:
 
-```json
-{
-  "notes": "some new notes again again again"
-}
-```
+- GET a single event:  http://127.0.0.1:5000/events/1. For HTTPie: `http 127.0.0.1:5000/events/1`
+- GET all events: http://127.0.0.1:5000/events
+- POST a new event: http://127.0.0.1:5000/events 
+    - refer to https://httpie.io/docs/cli/non-string-json-fields for HTTPie non-string fields.
+    ```json
+    {
+      "type": "Summer",
+      "year": 2022,
+      "country": "UK",
+      "NOC": "GBR",
+      "countries": 17,
+      "disabilities_included": "Spinal injury",
+      "end": "25-Sep-60",
+      "events": "113",
+      "participants_f": null,
+      "host": "London",
+      "male": null,
+      "participants_m": 209,
+      "region": "ITA",
+      "sports": "8",
+      "start": "18-Sep-60"
+    }
+    ```
+Take a note of the event id as you need it in the next request. Replace 28 with the id number that was retured.
 
-- DELET the 'ZZZ" region: `DELETE http://127.0.0.1:5000/regions/ZZZ`
-- GET a single event:  `GET`<http://127.0.0.1:5000/events/1>`
-- GET all events: `GET http://127.0.0.1:5000/events`
-- POST a new event: `POST http://127.0.0.1:5000/events` In the body select 'raw' and 'JSON' and enter
-
-```json
-{
-  "NOC": "GBR",
-  "countries": 17,
-  "disabilities_included": "Spinal injury",
-  "end": "25-Sep-60",
-  "events": "113",
-  "female": null,
-  "location": "London",
-  "male": null,
-  "participants": 209,
-  "region": "ITA",
-  "sports": "8",
-  "start": "18-Sep-60",
-  "type": "Summer",
-  "year": 2022
-}
-```
-
-- PATCH to update the new event: `POST http://127.0.0.1:5000/events/28` In the body select 'raw' and 'JSON' and enter
+- PATCH to update the new event: http://127.0.0.1:5000/events/28 In the body select 'raw' and 'JSON' and enter
 
 ```json
 {
