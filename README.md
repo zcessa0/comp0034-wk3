@@ -17,18 +17,18 @@ This assumes you have already forked the coursework repository and cloned the re
 
 Assume that the following routes were designed for the API.
 
-| HTTP method | URL                | Body                                                       | Response                                                      | 
-|:------------|:-------------------|:-----------------------------------------------------------|:--------------------------------------------------------------|
-| GET         | region             | None                                                       | Returns a list of NOC region codes with region name and notes | 
-| GET         | region/\<code\>    | None                                                       | Returns the region name and notes for a given code            | 
-| PATCH       | region/\<code\>    | Changed fields for the NOC record                          | Return all the details of the updated NOC record              | 
-| POST        | region             | Region code, region name and (optional) notes              | Status code 201 if new NOC code was saved.                    | 
-| DELETE      | region/\<code\>    | None                                                       | Removes an NOC code and if successful returns  202 (Accepted) | 
-| GET         | event              | None                                                       | Returns a list of events with all details                     | 
-| GET         | event/\<event_id\> | None                                                       | Returns all the details for a given event                     | 
-| POST        | event              | Event details                                              | Status code 201 if new event was saved.                       | 
-| PATCH       | event/\<event_id\> | Event details to be updated (specific fields to be passed) | Return all the details of the updated event                   | 
-| DELETE      | event/\<event_id\> | None                                                       | Removes an event and if successful returns  202 (Accepted)    | 
+| HTTP method | URL                 | Body                                                       | Response                                                      | 
+|:------------|:--------------------|:-----------------------------------------------------------|:--------------------------------------------------------------|
+| GET         | regions             | None                                                       | Returns a list of NOC region codes with region name and notes | 
+| GET         | regions/\<code\>    | None                                                       | Returns the region name and notes for a given code            | 
+| PATCH       | regions/\<code\>    | Changed fields for the NOC record                          | Return all the details of the updated NOC record              | 
+| POST        | regions             | Region code, region name and (optional) notes              | Status code 201 if new NOC code was saved.                    | 
+| DELETE      | regions/\<code\>    | None                                                       | Removes an NOC code and if successful returns  202 (Accepted) | 
+| GET         | events              | None                                                       | Returns a list of events with all details                     | 
+| GET         | events/\<event_id\> | None                                                       | Returns all the details for a given event                     | 
+| POST        | events              | Event details                                              | Status code 201 if new event was saved.                       | 
+| PATCH       | events/\<event_id\> | Event details to be updated (specific fields to be passed) | Return all the details of the updated event                   | 
+| DELETE      | events/\<event_id\> | None                                                       | Removes an event and if successful returns  202 (Accepted)    | 
 
 You will need to refer to the Flask documentation:
 
@@ -38,8 +38,8 @@ You will need to refer to the Flask documentation:
 ## 2. Serialize and deserialize the data
 
 Serialization refers to the process of converting a Python object into a format that can be used to store or transmit
-the
-data and then recreate the object when needed using the reverse process of deserialization.
+the data and then recreate the object when needed using the reverse process of deserialization. Python objects need to
+be converted into a flat structure that contains only native Python datatypes.
 
 There are different formats for the serialization of data, such as JSON, XML, and Python's pickle. JSON returns a
 human-readable string form, while Python’s pickle library can return a byte array.
@@ -47,8 +47,9 @@ human-readable string form, while Python’s pickle library can return a byte ar
 In the COMP0034 teaching materials pickle is used for serializing and deserializing machine learning models, and JSON
 for the REST API.
 
-You could serialize your own classes, for example by adding a `to_json` method to a class, or by creating an instance of the class and `dump`ing. The limitation of this is it cannot
-be handle relationships between classes:
+You could serialize your own classes, for example by adding a `to_json` method to a class, or by creating an instance of
+the class and `dump`ing. The limitation of this is it cannot
+be handle relationships between classes. The code would look something like this (not tested but should work!):
 
 ```python
 import json
@@ -61,22 +62,17 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(db.String, unique=True, nullable=False)
     password: Mapped[str] = mapped_column(db.String, unique=True, nullable=False)
 
-    def __init__(self, email: str, password_string: str):
-        self.email = email
-        self.password = self._hash_password(password_string)
-
     def to_json(self):
         return json.dumps(self.__dict__)
 
-# Get a list of users then use the to_json method to convert to JSON
-users = get_all_users()
-return [user.to_json() for user in users]
+
+# To use, create a User object by querying the database for the user with the id 1, serialise using to_json and then print the result
+user = db.session.execute(db.select(User).order_by(User.username)).scalars()
+user_json = user.to_json()
+print(user_json)
 ```
 
-This is a shortcut to passing the data to the jsonify() function, which will serialize any supported JSON data type.
-That means that all the data in the dict or list must be JSON serializable.
-
-For complex types such as database models, you can use a serialization library to convert the data to valid JSON types.
+For complex types such as database models, use a serialization library to convert the data to valid JSON types.
 There are many serialization libraries, this activity uses:
 
 - [Flask-Marshmallow](https://flask-marshmallow.readthedocs.io/en/latest/)
@@ -88,8 +84,11 @@ then `pip install flask-marshmallow marshmallow-sqlalchemy` will install them.
 The steps for this part are:
 
 - 2.1 Configure the app for Flask-Marshmallow
-- 2.2 Create Marshmallow-SQLAlchemy schemas. The schema can then be used to dump and load ORM objects (i.e. objects from
+- 2.2 Create Marshmallow-SQLAlchemy schemas. The schema can then be used to `dump` and `load` ORM objects (i.e. objects
+  from
   SQLAlchemy).
+
+`dump` refers to creating JSON from an object. `load` refers to creating an object from JSON.
 
 ### 2.1 Configure the app for Flask-Marshmallow
 
@@ -97,8 +96,8 @@ Flask-Marshmallow will be used with Flask-SQLAlchemy.
 The [documentation](https://flask-marshmallow.readthedocs.io/en/latest/#optional-flask-sqlalchemy-integration) states
 that Flask-SQLAlchemy must be initialized before Flask-Marshmallow.
 
-Other code from the `__init__.py` file is not shown here. Add the code to create and initialise Marshmallow to
-the `__init__.py` file:
+Add the code to create and initialise Marshmallow to the `__init__.py` file. Note that for brevity other code from
+the `__init__.py` file is not shown here:
 
 ```python
 from flask_marshmallow import Marshmallow
@@ -118,7 +117,7 @@ def create_app():
 
 ### 2.2 Create Marshmallow-SQLAlchemy schemas
 
-You now need to
+Now
 define [Marshmallow SQLAlchemy schemas as per their documentation](https://marshmallow-sqlalchemy.readthedocs.io/en/latest/#generate-marshmallow-schemas).
 These allow Marshmallow to essentially 'translate' the fields for a SQLAlchemy object and provide methods that allow you
 to convert the objects to JSON.
@@ -136,7 +135,7 @@ includes all the fields from your models class, so you do not have to repeat the
 
 `sqla_session = db.session` tells Marshmallow the session to use to work with the database. You need to include this.
 
-`load_instance = True` is optional and will deserialize to model instances
+`load_instance = True` is optional and will deserialize to model instances.
 
 `include_fk = True` is only needed if you want the foreign key field to be included in the data.
 
@@ -149,14 +148,10 @@ from paralympics.models import Event, Region
 from paralympics import db, ma
 
 
-# -------------------------
 # Flask-Marshmallow Schemas
 # See https://marshmallow-sqlalchemy.readthedocs.io/en/latest/#generate-marshmallow-schemas
-# -------------------------
 
-
-class RegionSchema(ma.SQLAlchemyS
-chema):
+class RegionSchema(ma.SQLAlchemySchema):
     """Marshmallow schema defining the attributes for creating a new region."""
 
     class Meta:
@@ -182,15 +177,22 @@ class EventSchema(ma.SQLAlchemyAutoSchema):
 
 ```
 
-## 3. Create instances of the schemas
+## 3. Create a REST API route
 
-First you need to import the Marshmallow SQLAlchemy schemas and create instances of them. This is the 'Schemas' section
-in the code below.
+The steps for this are:
 
-There are two variants of each schema shown, one provides a single result (e.g. one event), the other provides for
+1. Import the Marshmallow SQLAlchemy schemas and create instances of them in the python file where you define the
+   routes (`paralympics/paralympics.py`).
+2. Define the Flask route.
+3. Implement the function for the route to query the database, `dump` the result to JSON and return the JSON to the
+   browser.
+
+### 3.1 Import the Marshmallow SQLAlchemy schemas
+
+There are two variants of each schema shown below, one provides a single result (e.g. one event), the other provides for
 multiple results (e.g. all events).
 
-Add the following code to the file where the routes are defined i.e. in `paralympics.py`:
+Open the Python file with the routes, `paralympics\paralympics.py` and add:
 
 ```python
 from paralympics.schemas import RegionSchema, EventSchema
@@ -202,12 +204,12 @@ events_schema = EventSchema(many=True)
 event_schema = EventSchema()
 ```
 
-## 3. Route that returns all regions
+### 3.2 Define a route
 
-The first route is `/region` which gets a list of all the region codes and returns these in an HTTP response in JSON
-format.
+The first route is `/region` which gets a list of all the regions and returns them in JSON. This uses
+the [HTTP GET method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET).
 
-To define a route with an HTTP method in Flask:
+To define a route with an HTTP method in Flask you can use either of the following:
 
 ```python
 # Use route and specify the HTTP method(s). If you do not specify the methods then it will default to GET.
@@ -220,14 +222,27 @@ def something():
 def something():
 ```
 
+Add the following route:
+
+```python
+@app.get("/regions")
+def get_regions():
+    """Returns a list of NOC regions and their details in JSON."""
+```
+
+### 3.3 Implement the route function
+
+The route function, `get_regions()` should get a list of all the regions and returns these in an HTTP response in JSON
+format.
+
 The Flask-SQLAlchemy query syntax for a 'SELECT' query is explained in
 the [Flask-SQLAlchemy 3.1 documentation](https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/queries/#select)
 
-You query the database to get the results, then use the schemas to convert the SQLAlchemy result objects to a JSON
+Query the database to get the results, then use the schemas to convert the SQLAlchemy result objects to a JSON
 syntax.
 
 ```python
-@app.get("/region")
+@app.get("/regions")
 def get_regions():
     """Returns a list of NOC region codes and their details in JSON."""
     # Select all the regions using Flask-SQLAlchemy
@@ -246,19 +261,19 @@ control what is returned.
 Run the app and check that the route returns JSON.
 
 - Run the app `flask --app paralympics run --debug`
-- Go to <http://127.0.0.1:5000/noc>
+- Go to <http://127.0.0.1:5000/region>
 - Stop the app using `CTRL+C`
 
-Now try and implement the `@app.get('/event')` route yourself.
+Now try and implement the `@app.get('/events')` route yourself.
 
-## 4. Return one region/event
+## 4. Add a route to return one event
 
-To return a single event you need to specify the event id in the URL. This is done using a variable in the URL.
+To return a single event you need to specify the event's id in the URL. This is done using a variable in the URL.
 
 Variable routes in Flask can be defined as follows:
 
 ```python
-@app.get("/noc/<int:event_id>")
+@app.get("/events/<int:event_id>")
 def event_id(event_id):
     """Returns the details for a specified event id"""
     event = db.session.execute(
@@ -271,26 +286,107 @@ def event_id(event_id):
 Run the app and check that the route returns JSON for just one region.
 
 - Run the app `flask --app paralympics run --debug`
-- Go to <http://127.0.0.1:5000/noc/2>
+- Go to <http://127.0.0.1:5000/region/2>
 
-Now try and implement the `@app.get('/event/<event-id>')` route yourself.
+Now try and implement the `@app.get('/regions/<NOC>')` route yourself.
 
-## 5. Return 1 region
+## 5. Add a route to create a new event
 
-## 6. Add new event
+To create a new entry in a database, you submit a HTTP POST request in which you pass values for the new entry with the
+request. This is usually sent in the body of the request, though could be passed as parameters in the URL.
 
-## 7. Add new region
+To access the body of the request, you can import Flask `request`
 
-## 9. Update event
+```python
+from Flask import request
 
-PATCH AND PUT - EXPLAIN the difference
 
-Patch - partial update, so can just provide some of the fields.
+@app.post('/events')
+def add_event():
+    """ Adds a new event.
+    
+    Gets the JSON data from the request body and uses this to deserialise JSON to an object using Marshmallow 
+    event_schema.load()
 
-Put - all fields, so all fields must be provided.
+    :returns: JSON"""
+    ev_json = request.get_json()
+    event = event_schema.load(ev_json)
+    db.session.add(event)
+    db.session.commit()
+    return {"message": f"Event added with id= {event.id}"}
+```
 
-## 10. Update region
+Now try and implement the `@app.post('/regions')` route yourself.
 
-Delete event
+## 7. Add a route to delete an event
+This uses the HTTP DELETE method and will require the id of the event to be deleted.
 
-Delete region
+The code looks like this:
+
+```python
+@app.delete('/events/<int:event_id>')
+def delete_event(event_id):
+    """ Deletes an event.
+    
+    Gets the event from the database and deletes it.
+
+    :returns: JSON"""
+    event = db.session.execute(
+        db.select(Event).filter_by(event_id=event_id)
+    ).scalar_one_or_none()
+    db.session.delete(event)
+    db.session.commit()
+    return {"message": f"Event deleted with id= {event_id}"}
+```
+
+Now try and implement the `@app.delete('/regions/<noc_code>')` route yourself.
+
+## 9. Add a route to update an event
+
+To update there are two possible HTTP methods that could be used, PATCH or PUT.
+
+[PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) allows partial updates, allowing the option to
+update a selection of the fields.
+
+[PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) - will replace the resource so all fields must be
+provided.
+
+The following uses PATCH. As with the POST route, the data to be updated is passed in the body of the request.
+
+```python
+@app.patch("/events/<event_id>")
+def event_update(event_id):
+    """Updates changed fields for the event.
+
+    """
+    # Find the event in the database
+    existing_event = db.session.execute(
+        db.select(Event).filter_by(event_id=event_id)
+    ).scalar_one_or_none()
+    # Get the updated details from the json sent in the HTTP patch request
+    event_json = request.get_json()
+    # Use Marshmallow to update the existing records with the changes from the json
+    event_update = event_schema.load(event_json, instance=existing_event, partial=True)
+    # Commit the changes to the database
+    db.session.add(event_update)
+    db.session.commit()
+    # Return json showing the updated record
+    updated_event = db.session.execute(
+        db.select(Event).filter_by(event_id=event_id)
+    ).scalar_one_or_none()
+    result = event_schema.jsonify(updated_event)
+    response = make_response(result, 200)
+    response.headers["Content-Type"] = "application/json"
+    return response
+```
+
+## Further steps
+
+The above should be just sufficient to allow you to create the REST API routes for your application.
+
+Week 5 will consider:
+
+- Handling errors
+- Authentication
+
+[REST API examples with Flask + SQLAlchemy](https://marshmallow.readthedocs.io/en/stable/examples.html#quotes-api-flask-sqlalchemy)
