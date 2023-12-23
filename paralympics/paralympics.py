@@ -1,7 +1,7 @@
-from flask import current_app
+from flask import current_app as app
 
 
-@current_app.route('/')
+@app.route('/')
 def hello():
     return f"Hello!"
 

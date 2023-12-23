@@ -19,11 +19,11 @@ Assume that the following routes were designed for the API.
 
 | HTTP method | URL                | Body                                                       | Response                                                      | 
 |:------------|:-------------------|:-----------------------------------------------------------|:--------------------------------------------------------------|
-| GET         | noc                | None                                                       | Returns a list of NOC region codes with region name and notes | 
-| GET         | noc/\<code\>       | None                                                       | Returns the region name and notes for a given code            | 
-| PATCH       | noc/\<code\>       | Changed fields for the NOC record                          | Return all the details of the updated NOC record              | 
-| POST        | noc                | Region code, region name and (optional) notes              | Status code 201 if new NOC code was saved.                    | 
-| DELETE      | noc/\<code\>       | None                                                       | Removes an NOC code and if successful returns  202 (Accepted) | 
+| GET         | region             | None                                                       | Returns a list of NOC region codes with region name and notes | 
+| GET         | region/\<code\>    | None                                                       | Returns the region name and notes for a given code            | 
+| PATCH       | region/\<code\>    | Changed fields for the NOC record                          | Return all the details of the updated NOC record              | 
+| POST        | region             | Region code, region name and (optional) notes              | Status code 201 if new NOC code was saved.                    | 
+| DELETE      | region/\<code\>    | None                                                       | Removes an NOC code and if successful returns  202 (Accepted) | 
 | GET         | event              | None                                                       | Returns a list of events with all details                     | 
 | GET         | event/\<event_id\> | None                                                       | Returns all the details for a given event                     | 
 | POST        | event              | Event details                                              | Status code 201 if new event was saved.                       | 
@@ -175,7 +175,7 @@ event_schema = EventSchema()
 
 ## 3. Route that returns all regions
 
-The first route is `/noc` which gets a list of all the region codes and returns these in an HTTP response in JSON
+The first route is `/region` which gets a list of all the region codes and returns these in an HTTP response in JSON
 format.
 
 To define a route with an HTTP method in Flask:
@@ -197,8 +197,8 @@ You query the database to get the results, then use the schemas to convert the S
 syntax.
 
 ```python
-@app.get("/noc")
-def noc():
+@app.get("/region")
+def get_regions():
     """Returns a list of NOC region codes and their details in JSON."""
     # Select all the regions using Flask-SQLAlchemy
     all_regions = db.session.execute(db.select(Region)).scalars()
