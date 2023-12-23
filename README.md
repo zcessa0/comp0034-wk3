@@ -273,9 +273,14 @@ To return a single event you need to specify the event's id in the URL. This is 
 Variable routes in Flask can be defined as follows:
 
 ```python
-@app.get("/events/<int:event_id>")
+@app.get("/events/<event_id>")
 def event_id(event_id):
-    """Returns the details for a specified event id"""
+    """ Returns the event with the given id JSON.
+
+    :param event_id: The id of the event to return
+    :param type event_id: int
+    :returns: JSON
+    """
     event = db.session.execute(
         db.select(Event).filter_by(event_id=event_id)
     ).scalar_one_or_none()
@@ -319,6 +324,7 @@ def add_event():
 Now try and implement the `@app.post('/regions')` route yourself.
 
 ## 7. Add a route to delete an event
+
 This uses the HTTP DELETE method and will require the id of the event to be deleted.
 
 The code looks like this:
@@ -380,6 +386,82 @@ def event_update(event_id):
     return response
 ```
 
+## Checking the routes with Postman
+
+You will only be able to submit a GET request using the browser.
+
+To change the HTTP method to POST, UPDATE and DELETE, and to pass JSON in the body of the HTTP request, you either need
+Python code or a tool that supports this.
+
+For VS Code only, there is at least one extension, [Thunder Client](https://www.thunderclient.com), that can test REST APIs.
+
+[HTTPie](https://httpie.io/cli) has a version that works from a terminal. You can install using `pip install httpie`.
+
+A popular, and free, tool is Postman. The app has a lot of features and may you to sign up, though it is free.
+
+- [Postman documentation](https://learning.postman.com/docs/introduction/overview/)
+- [Postman download](https://www.postman.com/downloads/)
+- [Postman online (requires signup)](https://go.postman.co/home)
+
+Use postman or similar to try the routes for the paralympic app, e.g.:
+
+- GET for single region: `GET http://127.0.0.1:5000/regions/GBR`
+- GET for all regions: `GET http://127.0.0.1:5000/regions`
+
+
+- POST for new region: `POST http://127.0.0.1:5000/regions` For Postman, in the body select 'raw' and 'JSON' and enter
+
+```json
+{
+  "NOC": "ZZZ",
+  "region": "ZedZedZed"
+}
+```
+
+= PATCH to update the 'ZZZ' region adding notes: `PATCH http://127.0.0.1:5000/regions/ZZZ` In the body select 'raw' and '
+JSON' and enter
+
+```json
+{
+  "notes": "some new notes again again again"
+}
+```
+
+- DELET the 'ZZZ" region: `DELETE http://127.0.0.1:5000/regions/ZZZ`
+- GET a single event:  `GET`<http://127.0.0.1:5000/events/1>`
+- GET all events: `GET http://127.0.0.1:5000/events`
+- POST a new event: `POST http://127.0.0.1:5000/events` In the body select 'raw' and 'JSON' and enter
+
+```json
+{
+  "NOC": "GBR",
+  "countries": 17,
+  "disabilities_included": "Spinal injury",
+  "end": "25-Sep-60",
+  "events": "113",
+  "female": null,
+  "location": "London",
+  "male": null,
+  "participants": 209,
+  "region": "ITA",
+  "sports": "8",
+  "start": "18-Sep-60",
+  "type": "Summer",
+  "year": 2022
+}
+```
+
+- PATCH to update the new event: `POST http://127.0.0.1:5000/events/28` In the body select 'raw' and 'JSON' and enter
+
+```json
+{
+  "countries": 21,
+  "end": "25-Sep-22",
+  "start": "18-Sep-22",
+  "year": 2022
+}
+```
+
 ## Further steps
 
 The above should be just sufficient to allow you to create the REST API routes for your application.
@@ -389,4 +471,13 @@ Week 5 will consider:
 - Handling errors
 - Authentication
 
-[REST API examples with Flask + SQLAlchemy](https://marshmallow.readthedocs.io/en/stable/examples.html#quotes-api-flask-sqlalchemy)
+There are also Python and Flask libraries that are aimed at helping you to build REST APIs in Flask such as
+Flask-Restful that you can explore if you prefer.
+
+## Examples and tutorials
+
+There are more links in the reading list.
+
+- [RealPython REST API example](https://realpython.com/api-integration-in-python/#rest-and-python-building-apis)
+- [REST API examples with Flask + SQLAlchemy](https://marshmallow.readthedocs.io/en/stable/examples.html#quotes-api-flask-sqlalchemy)
+- [Miguel Grinberg's Flask mega tutorial Chapter 23, APIs](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxiii-application-programming-interfaces-apis)
