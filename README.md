@@ -1,6 +1,6 @@
 # Creating REST API routes
 
-COMP0034 2023-24 Week 3 coding activities
+COMP0034 2023-24 Week 3 coding activities.
 
 ## 1. Preparation
 
@@ -35,11 +35,40 @@ You will need to refer to the Flask documentation:
 - [routing](https://flask.palletsprojects.com/en/2.3.x/quickstart/#routing)
 - [HTTP methods](https://flask.palletsprojects.com/en/2.3.x/quickstart/#http-methods)
 
-## 2. Serialise and deserialise the data
+## 2. Serialize and deserialize the data
 
-You could serialise your own model classes. For example, get a list of all users and then iterate and convert to JSON:
+Serialization refers to the process of converting a Python object into a format that can be used to store or transmit
+the
+data and then recreate the object when needed using the reverse process of deserialization.
 
-```
+There are different formats for the serialization of data, such as JSON, XML, and Python's pickle. JSON returns a
+human-readable string form, while Python’s pickle library can return a byte array.
+
+In the COMP0034 teaching materials pickle is used for serializing and deserializing machine learning models, and JSON
+for the REST API.
+
+You could serialize your own classes, for example by adding a `to_json` method to a class, or by creating an instance of the class and `dump`ing. The limitation of this is it cannot
+be handle relationships between classes:
+
+```python
+import json
+from sqlalchemy.orm import Mapped, mapped_column
+from paralympics import db
+
+
+class User(db.Model):
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(db.String, unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(db.String, unique=True, nullable=False)
+
+    def __init__(self, email: str, password_string: str):
+        self.email = email
+        self.password = self._hash_password(password_string)
+
+    def to_json(self):
+        return json.dumps(self.__dict__)
+
+# Get a list of users then use the to_json method to convert to JSON
 users = get_all_users()
 return [user.to_json() for user in users]
 ```
@@ -185,6 +214,7 @@ To define a route with an HTTP method in Flask:
 @app.route('/something', methods=['GET', 'POST'])
 def something():
 
+
 # Use Flask shortcut methods for each HTTP method `.get`, `.post`, `.delete`, `.patch`, `.put`
 @app.get('/something')
 def something():
@@ -222,6 +252,7 @@ Run the app and check that the route returns JSON.
 Now try and implement the `@app.get('/event')` route yourself.
 
 ## 4. Return one region/event
+
 To return a single event you need to specify the event id in the URL. This is done using a variable in the URL.
 
 Variable routes in Flask can be defined as follows:
@@ -241,7 +272,6 @@ Run the app and check that the route returns JSON for just one region.
 
 - Run the app `flask --app paralympics run --debug`
 - Go to <http://127.0.0.1:5000/noc/2>
-
 
 Now try and implement the `@app.get('/event/<event-id>')` route yourself.
 
