@@ -12,7 +12,6 @@ This assumes you have already forked the coursework repository and cloned the re
 4. Open a browser and go to http://127.0.0.1:5000
 5. Stop the app using `CTRL+C`
 6. Check that you have an instance folder containing `paralympics.sqlite`
-7. Add data to the database by running `data\add_data.py`
 
 
 ## 2. Introduction
