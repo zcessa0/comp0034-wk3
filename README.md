@@ -1,4 +1,4 @@
-# Creating REST API routes
+# Creating the REST API routes in Flask
 
 COMP0034 2023-24 Week 3 coding activities.
 
