@@ -217,11 +217,13 @@ To define a route with an HTTP method in Flask you can use either of the followi
 # Use route and specify the HTTP method(s). If you do not specify the methods then it will default to GET.
 @app.route('/something', methods=['GET', 'POST'])
 def something():
+    pass
 
 
 # Use Flask shortcut methods for each HTTP method `.get`, `.post`, `.delete`, `.patch`, `.put`
 @app.get('/something')
 def something():
+    pass
 ```
 
 Add the following route:
@@ -299,7 +301,7 @@ Now try and implement the `@app.get('/regions/<NOC>')` route yourself.
 
 ## 5. Add a route to create a new event
 
-To create a new entry in a database, you submit a HTTP POST request in which you pass values for the new entry with the
+To create a new entry in a database, you submit an HTTP POST request in which you pass values for the new entry with the
 request. This is usually sent in the body of the request, though could be passed as parameters in the URL.
 
 To access the body of the request, you can import Flask `request`
@@ -455,7 +457,7 @@ Using the syntax covered above, try the following yourself:
       "start": "18-Sep-60"
     }
     ```
-Take a note of the event id as you need it in the next request. Replace 28 with the id number that was retured.
+Take a note of the event id as you need it in the next request. Replace 28 with the id number that was returned.
 
 - PATCH to update the new event: http://127.0.0.1:5000/events/28 In the body select 'raw' and 'JSON' and enter
 
