@@ -64,9 +64,6 @@ def create_app(test_config=None):
 def add_data_from_csv():
     """Adds data to the database if it does not already exist."""
 
-    # Add import here and not at the top of the file to avoid circular import issues
-    from paralympics.models import Region, Event
-
     # If there are no regions in the database, then add them
     first_region = db.session.execute(db.select(Region)).first()
     if not first_region:
@@ -109,3 +106,7 @@ def add_data_from_csv():
                           highlights=row[15])
                 db.session.add(e)
             db.session.commit()
+
+
+# Import can be here instead (but not at the top of the file) to avoid circular import issues
+from paralympics.models import Region, Event, User
