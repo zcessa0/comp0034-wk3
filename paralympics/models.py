@@ -1,6 +1,6 @@
 # Adapted from https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/quickstart/#define-models
 from typing import List
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from paralympics import db
 

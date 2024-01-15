@@ -95,14 +95,14 @@ def add_data_from_csv():
                           NOC=row[4],
                           start=row[5],
                           end=row[6],
-                          duration=row[7],
+                          duration=row[7] or None,
                           disabilities_included=row[8],
-                          countries=row[9],
-                          events=row[10],
-                          sports=row[11],
-                          participants_m=row[12],
-                          participants_f=row[13],
-                          participants=row[14],
+                          countries=row[9] or None,
+                          events=row[10] or None,
+                          sports=row[11] or None,
+                          participants_m=row[12] or None,
+                          participants_f=row[13] or None,
+                          participants=row[14] or None,
                           highlights=row[15])
                 db.session.add(e)
             db.session.commit()
