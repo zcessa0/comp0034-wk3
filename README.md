@@ -2,6 +2,12 @@
 
 COMP0034 2023-24 Week 3 coding activities.
 
+Updated 22/01/24:
+
+1. Refactored the methods to add data to the database. These are now in a module named 'database_utils.py'
+2. Added 'pseudo' code to illustrate the different types of REST API routes and how to access the HTTP request and
+   return an HTTP response. See `psuedo_code_routes.py`.
+
 ## 1. Preparation
 
 This assumes you have already forked the coursework repository and cloned the resulting repository to your IDE.
@@ -12,7 +18,6 @@ This assumes you have already forked the coursework repository and cloned the re
 4. Open a browser and go to http://127.0.0.1:5000
 5. Stop the app using `CTRL+C`
 6. Check that you have an instance folder containing `paralympics.sqlite`
-
 
 ## 2. Introduction
 
@@ -396,7 +401,8 @@ You will only be able to submit a GET request using the browser.
 To change the HTTP method to POST, UPDATE and DELETE, and to pass JSON in the body of the HTTP request, you either need
 Python code or a tool that supports this.
 
-For VS Code only, there is at least one extension, [Thunder Client](https://www.thunderclient.com), that can test REST APIs.
+For VS Code only, there is at least one extension, [Thunder Client](https://www.thunderclient.com), that can test REST
+APIs.
 
 [HTTPie](https://httpie.io/cli) has a version that works from a terminal. You can install using `pip install httpie`.
 
@@ -412,30 +418,33 @@ The following include HTTPie commands that you can use in the IDE's Terminal. Ma
 
 - GET for single region to URL http://127.0.0.1:5000/regions/GBR. HTTPie command: `http 127.0.0.1:5000/regions/GBR`
 - GET for all regions to http://127.0.0.1:5000/regions. HTTPie command: `http 127.0.0.1:5000/regions`
-- POST a new region to http://127.0.0.1:5000/regions For HTTPie: `http POST 127.0.0.1:5000/regions NOC=ZZZ region=ZedZedZed`
+- POST a new region to http://127.0.0.1:5000/regions For
+  HTTPie: `http POST 127.0.0.1:5000/regions NOC=ZZZ region=ZedZedZed`
 
-    - For Postman, in the body select 'raw' and 'JSON' and enter the JSON below. 
+    - For Postman, in the body select 'raw' and 'JSON' and enter the JSON below.
     ```json
     {
       "NOC": "ZZZ",
       "region": "ZedZedZed"
     }
     ```
-- PATCH to update the 'ZZZ' region adding notes. Use URL http://127.0.0.1:5000/regions/ZZZ. For HTTPie: `http PATCH 127.0.0.1:5000/regions/ZZZ notes="A new note."`
-  - For Postman, In the body select 'raw' and 'JSON' and enter
+- PATCH to update the 'ZZZ' region adding notes. Use URL http://127.0.0.1:5000/regions/ZZZ. For
+  HTTPie: `http PATCH 127.0.0.1:5000/regions/ZZZ notes="A new note."`
+    - For Postman, In the body select 'raw' and 'JSON' and enter
 
-    ```json
-    {
-      "notes": "A new note."
-    }
-    ```
-- DELETE the "ZZZ" region using URL http://127.0.0.1:5000/regions/ZZZ. For HTTPie: `http DELETE 127.0.0.1:5000/regions/ZZZ`
+      ```json
+      {
+        "notes": "A new note."
+      }
+      ```
+- DELETE the "ZZZ" region using URL http://127.0.0.1:5000/regions/ZZZ. For
+  HTTPie: `http DELETE 127.0.0.1:5000/regions/ZZZ`
 
 Using the syntax covered above, try the following yourself:
 
 - GET a single event:  http://127.0.0.1:5000/events/1. For HTTPie: `http 127.0.0.1:5000/events/1`
 - GET all events: http://127.0.0.1:5000/events
-- POST a new event: http://127.0.0.1:5000/events 
+- POST a new event: http://127.0.0.1:5000/events
     - refer to https://httpie.io/docs/cli/non-string-json-fields for HTTPie non-string fields.
     ```json
     {
@@ -456,6 +465,7 @@ Using the syntax covered above, try the following yourself:
       "start": "18-Sep-60"
     }
     ```
+
 Take a note of the event id as you need it in the next request. Replace 28 with the id number that was returned.
 
 - PATCH to update the new event: http://127.0.0.1:5000/events/28 In the body select 'raw' and 'JSON' and enter
