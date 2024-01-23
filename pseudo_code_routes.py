@@ -1,6 +1,6 @@
-""" This is a psuedo code structure for a REST API that has a database of 'things'
+""" This is a pseudocode structure for a REST API that has a database of 'things'
 
-This contains 'pseudo code' that is, it is not Python code and will not work, but rather has lines of text that state
+This contains 'pseudocode' that is, it is not Python code and will not work, but rather has lines of text that state
 the code logic
 
 Every request accepts an HTTP request and returns and HTTP response
@@ -12,24 +12,27 @@ The request has: url (which may have a variable component), header and body, the
 
 HTTP response
 If you return JSON data from the function then it will be handled by Flask as an HTTP response with JSON content
-If you want to modify the reponse, you can create your own response using make_response(body, HTTP status code, headers)
+If you want to modify the response, you can create your own response using make_response(body, HTTP status code,
+headers)
 Make response takes a status code, body (containing JSON) and a header
 HTTP response codes are pre-defined, e.g. 200 OK, 404 Not Found (use a reference to find out what they are)
 
 Converting from JSON to SQLAlchemy objects (called serialising/de-serialising)
 'dump' means to take one or more objects and convert to JSON
 'load' means to use JSON to load the data for one or more objects
-There are diffent approaches to this:
+There are different approaches to this:
 
-1. Python json library (part of Python base install so you don't need to pip install it)
-json.dumps() returns
-json.loads() returns
+1. Python json library (part of Python base install, so you don't need to pip install it)
+json.dumps() returns JSON
+json.loads() de-serialise JSON
 
 2. Flask jsonify e.g. from flask import jsonify
-jsonify() returns
-??
+jsonify() is like dumps() See https://flask.palletsprojects.com/en/3.0.x/patterns/javascript/#return-json-from-views
+This function allows you take json from the request to an object:
+https://flask.palletsprojects.com/en/3.0.x/patterns/javascript/#receiving-json-in-views (NB I have not tried this but
+assume it works!)
 
-3. Create a Flask-Marshmallow schema, ThingSchema, that defines how to turn a SQLAlechmy object into JSON
+3. Create a Flask-Marshmallow schema, ThingSchema, that defines how to turn a SQLAlchemy object into JSON
 and vice-versa.
 Create two instances of the schema, one that handles a single result and one that handles multiple objects.
 things_schema = ThingSchema(many=True)
@@ -47,20 +50,20 @@ To use Flask_Marshmallow you also need to:
 3. Define schemas that map the SQLAlchemy objects defining the attributes and other features such as weather to load
 the relationships
 """
-from flask import current_app as app, request
+from flask import current_app as app
 
 
 @app.get('/things')
 def get_all_things():
     # You do not need to access anything from the request
 
-    # all_thing_objects = Query the database using FlaskSQLAlchemy syntax ending in .scalara() to get all things
+    # all_thing_objects = Query the database using FlaskSQLAlchemy syntax ending in .scalars() to get all things
 
     # all_things_json = Use things_schema.dumps(all_things_objects) to convert the FlaskSQLAlchemy
     # query result objects into JSON
 
     # Return the JSON which will generate a Flask HTTP response
-    # You can optionally specify headers, status code and body by using flask make_reponse
+    # You can optionally specify headers, status code and body by using flask make_response
     # return all_things_json
     pass  # This line is just here to prevent linting warnings while there is no real code, you do not use this in the
     # actual route!!
@@ -87,7 +90,7 @@ def get_one_thing(thing_id):
 
 @app.post('/things')
 def post_new_thing():
-    # Get the jspon from the request
+    # Get the json from the request
     # new_thing_json = request.get_json()
 
     # Create a new Thing object by using the thing_schema.load()
@@ -99,7 +102,7 @@ def post_new_thing():
 
     # Return JSON, for example you can make response or just return a message in JSON structure to add to the body of
     # the response
-    # return {"message": f"Event added with id= {event.id}"}
+    # return {"message": f"Thing added with id= {thing.id}"}
 
     pass  # This line is just here to prevent linting warnings while there is no real code, you do not use this in the
     # actual route!!
@@ -134,7 +137,7 @@ def update_one_thing(thing_id):
     # Get the updated details from the json sent in the HTTP patch request
     # thing_json = request.get_json()
 
-    # Use the schema to created a thing wich merges the changes from the json with the existing_thing
+    # Use the schema to create a thing which merges the changes from the json with the existing_thing
     # changed_thing = thing_schema.load(thing_json, instance=existing_thing, partial=True)
 
     # Save the changed_thing to the database using add() and commit()
