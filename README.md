@@ -387,9 +387,9 @@ def event_update(event_id):
     # Get the updated details from the json sent in the HTTP patch request
     event_json = request.get_json()
     # Use Marshmallow to update the existing records with the changes from the json
-    event_update = event_schema.load(event_json, instance=existing_event, partial=True)
+    event_updated = event_schema.load(event_json, instance=existing_event, partial=True)
     # Commit the changes to the database
-    db.session.add(event_update)
+    db.session.add(event_updated)
     db.session.commit()
     # Return json showing the updated record
     updated_event = db.session.execute(
