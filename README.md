@@ -250,6 +250,9 @@ Query the database to get the results, then use the schemas to convert the SQLAl
 syntax.
 
 ```python
+from paralympics import db
+from paralympics.models import Region
+
 @app.get("/regions")
 def get_regions():
     """Returns a list of NOC region codes and their details in JSON."""
@@ -281,8 +284,10 @@ To return a single event you need to specify the event's id in the URL. This is 
 Variable routes in Flask can be defined as follows:
 
 ```python
+from paralympics.models import Event
+
 @app.get("/events/<event_id>")
-def event_id(event_id):
+def get_event(event_id):
     """ Returns the event with the given id JSON.
 
     :param event_id: The id of the event to return
@@ -368,6 +373,8 @@ provided.
 The following uses PATCH. As with the POST route, the data to be updated is passed in the body of the request.
 
 ```python
+from flask import make_response
+
 @app.patch("/events/<event_id>")
 def event_update(event_id):
     """Updates changed fields for the event.

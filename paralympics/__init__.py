@@ -1,6 +1,4 @@
-import csv
 import os
-from pathlib import Path
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -53,6 +51,7 @@ def create_app(test_config=None):
     with app.app_context():
         # Create the database and tables if they don't already exist
         db.create_all()
+
         # Add the data to the database if not already added
         from paralympics.database_utils import add_data
         add_data(db)
