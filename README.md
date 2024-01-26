@@ -295,9 +295,9 @@ def get_event(event_id):
     :returns: JSON
     """
     event = db.session.execute(
-        db.select(Event).filter_by(event_id=event_id)
+        db.select(Event).filter_by(id=event_id)
     ).scalar_one_or_none()
-    return events_schema.dump(event)
+    return event_schema.dump(event)
 
 ```
 
