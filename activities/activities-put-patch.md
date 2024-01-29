@@ -81,5 +81,44 @@ works:
 
 ![PATCH request](postman-patch.png)
 
-Another approach if you are not using Marshmallow but want to go direct to the SQLAlchemy object:
+Another approach if you are not using Marshmallow schemas, is to use the SQLAlchemy object which would be something like
+the following code (code not tested so there could be an error!):
+
+```python
+@app.route("/regions/<noc_code>", methods=['PUT', 'PATCH'])
+def region_update(noc_code):
+    # Note: There is no error handling in the solution below. Week 5 focuses on error handling.
+
+    # Find the region in the database
+    existing_region = db.session.execute(db.select(Region).filter_by(NOC=noc_code)).scalar_one_or_none()
+
+    # Get the updated details from the json sent in the HTTP patch request
+    region_json = request.get_json()
+
+    # If the method of the request is PATCH, then loop through all the JSON and update the any of the fields found
+    if request.method == 'PATCH':
+        for key, value in region_json.items():
+            existing_region.key == value
+        db.session.add(existing_region)
+    if request.method == 'PUT':
+        # If the method is PUT and an existing region is found, update all mandatory fields
+        if existing_region:
+            existing_region.NOC = region_json['NOC']
+            existing_region.region = region_json['region']
+            if region_json['notes']:
+                existing_region.notes = region_json['notes']
+            db.session.add(existing_region)
+        else:
+            # If the region is not found, then add a new record
+            new_region = Region(NOC=region_json['NOC'], region=region_json['region'],
+                                notes=region_json['notes'] or None)
+            db.session.add(new_region)
+
+
+# Commit the changes to the database
+db.session.commit()
+
+return {"message": f"Region {noc_code} updated"}
+
+```
 
