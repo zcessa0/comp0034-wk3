@@ -81,8 +81,8 @@ works:
 
 ![PATCH request](postman-patch.png)
 
-Another approach if you are not using Marshmallow schemas, is to use the SQLAlchemy object which would be something like
-the following code (code not tested so there could be an error!):
+Another approach if you are not using Marshmallow schemas for validation, is to use the SQLAlchemy object which I think would be
+something like the following code (code not tested so there could be an error!):
 
 ```python
 @app.route("/regions/<noc_code>", methods=['PUT', 'PATCH'])
@@ -114,11 +114,10 @@ def region_update(noc_code):
                                 notes=region_json['notes'] or None)
             db.session.add(new_region)
 
+    # Commit the changes to the database
+    db.session.commit()
 
-# Commit the changes to the database
-db.session.commit()
-
-return {"message": f"Region {noc_code} updated"}
+    return {"message": f"Region {noc_code} updated"}
 
 ```
 
